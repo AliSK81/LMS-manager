@@ -1,5 +1,6 @@
 # pip install selenium
 # pip install webdriver-manager
+# https://chromedriver.storage.googleapis.com/98.0.4758.80/chromedriver_win32.zip
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -23,5 +24,12 @@ username.send_keys(USERNAME)
 password.send_keys(PASSWORD)
 submit.click()
 
-input("Press enter to exit..")
-browser.quit()
+try:
+    assert "errors" not in browser.page_source
+
+except AssertionError:
+    print("wrong username or password.")
+
+finally:
+    input("Press enter to exit..")
+    browser.quit()
