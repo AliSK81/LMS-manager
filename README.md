@@ -1,7 +1,7 @@
 # LMS-manager
 
 This script helps you log in to your LMS account and enter the currently running session, all in a second.
-
+</br>
 ## Install packages
 First, make sure Python is installed on your system; Open the terminal and run:
 ```
@@ -18,6 +18,9 @@ With pip installed, the installation is straightforward, run:
 pip install -r req.txt
 ```
 
+Finally, download `chromedriver` from [here](https://chromedriver.storage.googleapis.com/98.0.4758.80/chromedriver_win32.zip). After extraction, copy `chromedriver.exe` to the `C:\` drive. </br></br>
+**Note:** Get latest [chromedriver](https://chromedriver.chromium.org/downloads) version matching your [Google Chrome](https://www.google.com/chrome/) version.
+</br>
 ## Get started
 Create file `config.py` and put the following properties in it:
 ```
