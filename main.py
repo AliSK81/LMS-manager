@@ -1,43 +1,33 @@
-# pip install selenium
-# pip install webdriver-manager
-# https://chromedriver.storage.googleapis.com/98.0.4758.80/chromedriver_win32.zip
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.common.by import By
-from config import USERNAME, PASSWORD
-from meeting import join_meeting
+from driver import WebDriver
+from meeting import Meeting
 
-s = Service(ChromeDriverManager().install())
-browser = webdriver.Chrome(service=s)
-browser.maximize_window()
 
-browser.get("http://lms.ui.ac.ir/")
+def main():
+    driver = WebDriver()
+    browser = driver.browser
+    meeting = Meeting(browser)
 
-username = browser.find_element(By.ID, "username")
-password = browser.find_element(By.ID, "password")
-submit = browser.find_element(By.ID, "submit")
+    try:
+        driver.load_browser()
+        driver.login_account()
 
-# close announcement
-annonmentc = browser.find_element(By.ID, "annonmentc")
-annonmentc.click()
+        if meeting.join_meeting():
+            driver.switch_newtab()
+            meeting.wait_progress()
+            meeting.listen_only()
+            # meeting.microphone()
+            meeting.send_message("سلام")
 
-# login to account
-username.send_keys(USERNAME)
-password.send_keys(PASSWORD)
-submit.click()
+        else:
+            print("no sessions are running..")
 
-try:
-    # assert success login
-    assert "errors" not in browser.page_source
+    except AssertionError:
+        print("wrong username or password.")
 
-    # join the current meeting
-    status = join_meeting(browser)
-    print(status)
+    finally:
+        input("press enter to exit..")
+        browser.quit()
 
-except AssertionError:
-    print("wrong username or password.")
 
-finally:
-    input("press enter to exit..")
-    browser.quit()
+if __name__ == "__main__":
+    main()
