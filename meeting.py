@@ -1,45 +1,52 @@
 import time
 
 from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
+
+from driver import Browser
 
 
 class Meeting:
-    def __init__(self, browser: Chrome):
+    def __init__(self, browser: Browser):
         self.browser = browser
 
-    def join_meeting(self):
-        meetings = self.browser.find_elements(By.CSS_SELECTOR, ".newmeet a")
+    def join_meeting(self, period=5):
+        while self.browser:
 
-        for meeting in meetings:
-            href = meeting.get_attribute("href")
+            self.browser.execute_script("paginateUpcomingJaams(upcomingJaamPage)")
+            meetings = self.browser.find_elements(By.CSS_SELECTOR, ".newmeet a")
 
-            if "/join/" in str(href):
-                meeting.click()
-                return True
+            for meeting in meetings:
+                href = meeting.get_attribute("href")
 
+                if "/join/" in str(href):
+                    meeting.click()
+                    return True
+
+            time.sleep(period)
+            # self.browser.refresh()
         return False
 
-    def wait_progress(self):
-        while True:
+    def wait_progress(self, period=10):
+        while self.browser:
             try:
                 self.browser.find_element(By.ID, "progressBar")
-                time.sleep(10)
                 self.browser.refresh()
+                time.sleep(period)
 
             except NoSuchElementException:
-                break
+                return True
+        return False
 
-    def listen_only(self):
-        self.browser.implicitly_wait(10)
+    def listen_only(self, delay=10):
+        self.browser.implicitly_wait(delay)
         self.browser.find_element(By.CLASS_NAME, "icon-bbb-listen").click()
 
-    def microphone(self):
-        self.browser.implicitly_wait(10)
+    def unmute_mic(self, delay=10):
+        self.browser.implicitly_wait(delay)
         self.browser.find_element(By.CLASS_NAME, "icon-bbb-unmute").click()
 
-    def send_message(self, msg):
-        self.browser.implicitly_wait(5)
+    def send_message(self, msg, delay=10):
+        self.browser.implicitly_wait(delay)
         self.browser.find_element(By.ID, "message-input").send_keys(msg)
         self.browser.find_element(By.CLASS_NAME, "icon-bbb-send").click()
