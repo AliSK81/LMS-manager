@@ -1,33 +1,10 @@
-from driver import WebDriver
-from meeting import Meeting
-
-
-def main():
-    driver = WebDriver()
-    browser = driver.browser
-    meeting = Meeting(browser)
-
-    try:
-        driver.load_browser()
-        driver.login_account()
-
-        if meeting.join_meeting():
-            driver.switch_newtab()
-            meeting.wait_progress()
-            meeting.listen_only()
-            # meeting.microphone()
-            meeting.send_message("سلام")
-
-        else:
-            print("no sessions are running..")
-
-    except AssertionError:
-        print("wrong username or password.")
-
-    finally:
-        input("press enter to exit..")
-        browser.quit()
-
+from gui import Form
 
 if __name__ == "__main__":
-    main()
+    # Hide console
+    # import win32con, win32gui
+    # hide = win32gui.GetForegroundWindow()
+    # win32gui.ShowWindow(hide, win32con.SW_HIDE)
+
+    # Show GUI
+    Form().mainloop()
