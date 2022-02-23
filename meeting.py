@@ -10,21 +10,16 @@ class Meeting:
     def __init__(self, browser: Browser):
         self.browser = browser
 
-    def join_meeting(self, period=5):
-        while self.browser:
+    def join_meeting(self):
+        meetings = self.browser.find_elements(By.CSS_SELECTOR, ".newmeet a")
 
-            self.browser.execute_script("paginateUpcomingJaams(upcomingJaamPage)")
-            meetings = self.browser.find_elements(By.CSS_SELECTOR, ".newmeet a")
+        for meeting in meetings:
+            href = meeting.get_attribute("href")
 
-            for meeting in meetings:
-                href = meeting.get_attribute("href")
+            if "/join/" in str(href):
+                meeting.click()
+                return True
 
-                if "/join/" in str(href):
-                    meeting.click()
-                    return True
-
-            time.sleep(period)
-            # self.browser.refresh()
         return False
 
     def wait_progress(self, period=10):
@@ -44,7 +39,9 @@ class Meeting:
 
     def unmute_mic(self, delay=10):
         self.browser.implicitly_wait(delay)
-        self.browser.find_element(By.CLASS_NAME, "icon-bbb-unmute").click()
+        self.browser.find_element(By.CSS_SELECTOR, "button[aria-label=Microphone]").click()
+        time.sleep(2)
+        self.browser.find_element(By.CLASS_NAME, "icon-bbb-thumbs_up").click()
 
     def send_message(self, msg, delay=10):
         self.browser.implicitly_wait(delay)
