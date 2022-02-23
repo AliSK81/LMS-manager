@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter.ttk import Combobox
 
 import process
-from user import *
+from user import User
 
 
 class Form(Tk):
@@ -13,7 +13,20 @@ class Form(Tk):
         self.__init_components()
 
     def start(self):
-        Thread(target=process.run, args=[self], daemon=True).start()
+        index = self.name_cbox.current()
+
+        args = [
+            User.load_users()[index] if index > 0 else User(self.username_ent.get(),
+                                                            self.password_ent.get(),
+                                                            self.name_cbox.get()),
+            self.save_info_cbtn.get(),
+            self.enter_meet_cbtn.get(),
+            self.microphone_cbtn.get(),
+            "سلام" if self.say_hello_cbtn.get() else None,
+            self.msg_lbl
+        ]
+
+        Thread(target=process.run, args=args, daemon=True).start()
 
     def destroy(self):
         super().destroy()
@@ -26,7 +39,7 @@ class Form(Tk):
         self.attributes('-topmost', True)
 
     def __init_components(self):
-        users = load_users()
+        users = User.load_users()
         index = 0 if len(users) == 1 else 1
 
         Label(self, text="Name:", width=20).grid(column=0, row=0, pady=10)
@@ -43,9 +56,9 @@ class Form(Tk):
         self.password_ent.grid(column=1, row=2, ipadx=12)
 
         self.enter_meet_cbtn = IntVar(value=1)
-        self.say_hello_cbtn = IntVar(value=1)
+        self.say_hello_cbtn = IntVar()
         self.microphone_cbtn = IntVar()
-        self.save_info_cbtn = IntVar()
+        self.save_info_cbtn = IntVar(value=1)
 
         Checkbutton(self, text="Enter Meeting", variable=self.enter_meet_cbtn, onvalue=1, offvalue=0,
                     width=17).grid(column=0, row=5, padx=10, pady=0)

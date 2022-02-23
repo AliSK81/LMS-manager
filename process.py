@@ -2,76 +2,73 @@ from time import sleep
 
 from driver import WebDriver
 from meeting import Meeting
-from user import *
 
 
-def run(form):
-    form.msg_lbl.configure(text="Loading browser...", fg="blue")
-
+def run(user, save_user, enter_meet, mic_on, first_msg, logger=None):
     browser = None
 
     try:
-        index = form.name_cbox.current()
-        user = load_users()[index] if index > 0 else User(form.username_ent.get(),
-                                                          form.password_ent.get(),
-                                                          form.name_cbox.get())
-        assert index > 0 or user.username != "" or user.username != ""
+        log("Loading browser...", logger)
 
         driver = WebDriver()
         browser = driver.browser
         meeting = Meeting(browser)
 
-        form.msg_lbl.configure(text="Opening site..", fg="purple")
+        log("Opening site..", logger)
 
         driver.load_browser()
 
-        form.msg_lbl.configure(text="Logging in.", fg="orange")
+        log("Logging in.", logger)
 
         driver.login_account(user)
 
-        form.msg_lbl.configure(text="")
+        log("", logger)
 
-        # browser.maximize_window()
-        # browser.execute_script("window.scrollTo(0, 120)")
+        if save_user:
+            user.save_user()
 
-        if form.save_info_cbtn.get():
-            save_user(user)
-
-        if not form.enter_meet_cbtn.get():
+        if not enter_meet:
             return
 
-        form.msg_lbl.configure(text="Refreshing list..", fg="green")
-
         if not meeting.join_meeting():
+            log("No meetings found..", logger)
             return
 
         driver.switch_newtab()
 
-        form.msg_lbl.configure(text="Waiting for master...", fg="purple")
+        log("Waiting to join...", logger)
 
         if not meeting.wait_progress():
             return
 
-        form.msg_lbl.configure(text="")
+        log("Selecting sound mode..", logger)
 
         sleep(2)
 
-        if form.microphone_cbtn.get():
+        if mic_on:
             meeting.unmute_mic()
         else:
             meeting.listen_only()
 
-        sleep(5)
+        log("", logger)
 
-        if form.say_hello_cbtn.get():
-            meeting.send_message("سلام")
+        sleep(2)
 
-        return
+        if first_msg:
+            meeting.send_message(first_msg)
+
 
     except AssertionError:
-        form.msg_lbl.configure(text="wrong username or password!", fg="red")
+        log("Wrong username or password!", logger)
         if browser is not None:
             browser.quit()
 
     except Exception as e:
-        print(e.args[0])
+        log("Unknown error. try again!", logger)
+        log(e.args[0])
+
+
+def log(msg, logger=None):
+    if logger:
+        logger.configure(text=msg)
+    print(msg)
