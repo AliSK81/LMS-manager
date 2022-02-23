@@ -1,3 +1,5 @@
+from subprocess import CREATE_NO_WINDOW
+
 from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
@@ -26,8 +28,11 @@ class DriverOptions(Options):
 
 class Browser(Chrome):
     def __init__(self):
-        super().__init__(options=DriverOptions(),
-                         service=Service(ChromeDriverManager(log_level=50).install()))
+        o = DriverOptions()
+        s = Service(ChromeDriverManager(log_level=0).install())
+        # hide chromedriver console window. (windows only)
+        s.creationflags = CREATE_NO_WINDOW
+        super().__init__(options=o, service=s)
 
 
 class WebDriver:
