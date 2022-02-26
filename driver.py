@@ -1,5 +1,6 @@
 from subprocess import CREATE_NO_WINDOW
 
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
@@ -43,7 +44,10 @@ class WebDriver:
         self.browser.get("http://lms.ui.ac.ir/")
 
     def login_account(self, user):
-        self.browser.find_element(By.ID, "annonmentc").click()
+        try:
+            self.browser.find_element(By.ID, "annonmentc").click()
+        except WebDriverException:
+            pass
         self.browser.find_element(By.ID, "username").send_keys(user.username)
         self.browser.find_element(By.ID, "password").send_keys(user.password)
         self.browser.find_element(By.ID, "submit").click()
